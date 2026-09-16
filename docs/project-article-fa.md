@@ -137,12 +137,12 @@ BoT-SORT ترکیبی از فیلتر کالman و اطلاعات ظاهری (Re
 
 مسیر پیشنهادی روی ویندوز:
 
-`C:\Users\Megam\source\repos\Yolo26-Human-Detection`
+`C:\Users\Megam\source\repos\Yolo11-Human-Detection`
 
 ### نصب
 
 ```powershell
-cd C:\Users\Megam\source\repos\Yolo26-Human-Detection
+cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt

@@ -2,7 +2,7 @@
 
 This guide explains how to set up, run, and verify the project on **Windows** at:
 
-`C:\Users\Megam\source\repos\Yolo26-Human-Detection`
+`C:\Users\Megam\source\repos\Yolo11-Human-Detection`
 
 The same steps work on Linux/macOS with path and shell adjustments.
 
@@ -25,20 +25,30 @@ The same steps work on Linux/macOS with path and shell adjustments.
 
 ---
 
-## 2. Clone and enter the project
+## 2. Clone from cloud to your PC
+
+The project was built in Cursor Cloud. To copy it to your machine:
+
+1. Open this project’s **agent view** in Cursor and click **Create repo** (if not done yet).
+2. Copy the **clone URL** from that screen (recommended once the repo is created).
 
 ```powershell
+mkdir C:\Users\Megam\source\repos -Force
 cd C:\Users\Megam\source\repos
-git clone <your-repo-url> Yolo26-Human-Detection
-cd Yolo26-Human-Detection
+git clone https://origin.cursor.com/git/iman-ahmadi-dev/tmp-f3fe1242054da8a1.git Yolo11-Human-Detection
+cd Yolo11-Human-Detection
+git checkout cursor/yolo-human-detection-d5be
 ```
 
-If you already have the folder, pull the latest branch:
+Replace the URL with your permanent repo URL after **Create repo**. Folder name **`Yolo11-Human-Detection`** matches the YOLO11 model used in the project (`yolo11n.pt`).
+
+If the folder already exists, update it:
 
 ```powershell
-cd C:\Users\Megam\source\repos\Yolo26-Human-Detection
-git pull
+cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
+git fetch origin
 git checkout cursor/yolo-human-detection-d5be
+git pull origin cursor/yolo-human-detection-d5be
 ```
 
 ---
@@ -248,7 +258,7 @@ PORT=8766
 ## 11. Project structure reference
 
 ```
-Yolo26-Human-Detection/
+Yolo11-Human-Detection/
 ├── app/
 │   ├── main.py              # FastAPI web server
 │   ├── pipeline.py          # Capture + inference loop
