@@ -1,0 +1,5 @@
+# Optional DeepFace layer. Install after the core venv works:
+#   .\.venv\Scripts\python.exe -m pip install -r requirements-face.txt
+# Then set FACE_RECOGNITION_ENABLED=true in .env
+deepface>=0.0.93
+tf-keras>=2.16.0

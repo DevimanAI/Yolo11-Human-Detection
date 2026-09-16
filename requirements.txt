@@ -1,11 +1,13 @@
-ultralytics>=8.3.0
-opencv-python-headless>=4.8.0
+# Core runtime for detection, tracking, and the web demo.
+# Install inside a project venv — Microsoft Store Python user-site paths
+# are too long for PyTorch on Windows (WinError 206).
+ultralytics>=8.3.0,<8.5
+opencv-python>=4.8.0,<5
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-dotenv>=1.0.0
 numpy>=1.24.0
-deepface>=0.0.93
-tf-keras>=2.16.0
 pillow>=10.0.0
 jinja2>=3.1.0
 python-multipart>=0.0.9
+lap>=0.5.12

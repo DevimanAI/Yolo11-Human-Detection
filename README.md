@@ -8,53 +8,65 @@ University-grade computer vision project: **Ultralytics YOLO** person detection,
 - Persistent track IDs across frames (`bytetrack.yaml` or `botsort.yaml`)
 - Optional face identification from `data/known_faces/<Name>/`
 - Web UI with live MJPEG stream and source switching
-- Windows-friendly setup documented for `C:\Users\Megam\source\repos\Yolo11-Human-Detection`
-
-## Get the project on your PC (from cloud)
-
-The code lives in this Cursor cloud agent repo. On your Windows machine:
-
-1. In the Cursor **agent view** for this project, click **Create repo** if you have not already (this publishes the code to your git remote).
-2. Copy the clone URL shown there (Origin), or use:
-   `https://origin.cursor.com/git/iman-ahmadi-dev/tmp-f3fe1242054da8a1.git`
-3. In **PowerShell**:
-
-```powershell
-mkdir C:\Users\Megam\source\repos -Force
-cd C:\Users\Megam\source\repos
-git clone https://origin.cursor.com/git/iman-ahmadi-dev/tmp-f3fe1242054da8a1.git Yolo11-Human-Detection
-cd Yolo11-Human-Detection
-git checkout cursor/yolo-human-detection-d5be
-```
-
-Use the clone URL from **Create repo** once your permanent repository exists — it replaces the temporary URL above.
 
 ## Quick start (Windows)
 
+Python 3.10+ must be on PATH (`python --version`). The `py` launcher is **not** required.
+
+Use a **project virtual environment**. Installing into Microsoft Store Python fails on Windows with **WinError 206** (path too long) while upgrading PyTorch, so `ultralytics` never gets installed.
+
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
-py -3.10 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
-python scripts\smoke_test.py
-python run.py
+.\scripts\setup.ps1
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+.\.venv\Scripts\python.exe run.py
 ```
 
+`setup.ps1` creates `.venv`, installs `requirements.txt`, and copies `.env.example` to `.env` if needed.
+
 Open **http://127.0.0.1:8765** in your browser. Allow webcam access when prompted.
+
+Equivalent manual steps (if you prefer not to run the script):
+
+```powershell
+cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+copy .env.example .env
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+.\.venv\Scripts\python.exe run.py
+```
+
+If `Activate.ps1` is blocked by execution policy, keep using `.\.venv\Scripts\python.exe` as above — you do not need to activate the venv.
+
+Optional face recognition (heavy: TensorFlow + DeepFace):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-face.txt
+```
 
 Full run/test guide: [docs/run-and-test.md](docs/run-and-test.md)  
 Persian project article: [docs/project-article-fa.md](docs/project-article-fa.md)
 
-## Quick start (Linux / cloud dev)
+## Quick start (Linux / macOS)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 cp .env.example .env
 python scripts/smoke_test.py
 python run.py
+```
+
+Or: `bash scripts/setup.sh`
+
+## Clone
+
+```powershell
+git clone https://github.com/DevimanAI/Yolo11-Human-Detection.git
+cd Yolo11-Human-Detection
 ```
 
 ## Project layout
@@ -62,15 +74,18 @@ python run.py
 ```
 app/                  # FastAPI app, YOLO pipeline, face registry
   detector.py         # YOLO + tracking
-  face_registry.py    # DeepFace embeddings
+  face_registry.py    # DeepFace embeddings (optional)
   pipeline.py         # Video capture + inference loop
   main.py             # Web server
+  env_check.py        # Missing-package hints for smoke/run
 data/
   known_faces/        # Register known people here
   sample/             # Smoke-test output
 scripts/
+  setup.ps1           # Windows venv + pip install
   smoke_test.py       # Download sample + verify detection
-requirements.txt
+requirements.txt      # Core demo (no TensorFlow)
+requirements-face.txt # Optional DeepFace extras
 .env.example
 run.py
 ```
@@ -87,6 +102,8 @@ run.py
 | `KNOWN_FACES_DIR` | `data/known_faces` | Known people photos |
 | `PORT` | `8765` | Web server port |
 
+Face labels stay `Unknown` until `requirements-face.txt` is installed and photos exist under `known_faces`.
+
 ## Register known faces
 
 ```
@@ -98,6 +115,16 @@ data/known_faces/
 ```
 
 Restart the server after adding images. Bounding boxes show `ID <track> | <name> (confidence)`.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `py` is not recognized | Use `python -m venv .venv` (or `.\scripts\setup.ps1`) |
+| `Activate.ps1` is not recognized | The venv was not created. Run setup, then `.\.venv\Scripts\python.exe` |
+| `ModuleNotFoundError: ultralytics` | Packages went to Store Python. Reinstall **inside** `.venv` |
+| `WinError 206` filename too long | Stop using Store Python user-site. Use `.venv` (shorter path) |
+| Smoke test finds 0 people | Confirm `data/sample/bus.jpg` downloaded; retry on a working network |
 
 ## Limitations
 

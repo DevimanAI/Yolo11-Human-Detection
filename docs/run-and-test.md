@@ -19,36 +19,27 @@ The same steps work on Linux/macOS with path and shell adjustments.
 
 ### Windows-specific
 
-1. Install Python from [python.org](https://www.python.org/downloads/) and check **“Add Python to PATH”**.
+1. Install Python 3.10+ from [python.org](https://www.python.org/downloads/) and check **“Add python.exe to PATH”**. The `py` launcher is optional and often missing.
 2. Open **PowerShell** (not CMD) for the commands below.
 3. Allow the app through Windows Firewall when prompted (port **8765**).
+4. Always install packages into **`.venv`**. Microsoft Store Python user-site paths are too long for PyTorch (**WinError 206**), which is why `ultralytics` goes missing.
 
 ---
 
-## 2. Clone from cloud to your PC
-
-The project was built in Cursor Cloud. To copy it to your machine:
-
-1. Open this project’s **agent view** in Cursor and click **Create repo** (if not done yet).
-2. Copy the **clone URL** from that screen (recommended once the repo is created).
+## 2. Clone the repository
 
 ```powershell
 mkdir C:\Users\Megam\source\repos -Force
 cd C:\Users\Megam\source\repos
-git clone https://origin.cursor.com/git/iman-ahmadi-dev/tmp-f3fe1242054da8a1.git Yolo11-Human-Detection
+git clone https://github.com/DevimanAI/Yolo11-Human-Detection.git
 cd Yolo11-Human-Detection
-git checkout cursor/yolo-human-detection-d5be
 ```
 
-Replace the URL with your permanent repo URL after **Create repo**. Folder name **`Yolo11-Human-Detection`** matches the YOLO11 model used in the project (`yolo11n.pt`).
-
-If the folder already exists, update it:
+If the folder already exists:
 
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
-git fetch origin
-git checkout cursor/yolo-human-detection-d5be
-git pull origin cursor/yolo-human-detection-d5be
+git pull origin main
 ```
 
 ---
@@ -136,38 +127,56 @@ Include in git only if the file stays under 1 MB; otherwise document this comman
 
 ---
 
-## 4. Create virtual environment
+## 4. Create virtual environment and install (recommended)
+
+From the repo root:
 
 ```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.\scripts\setup.ps1
 ```
 
-If script execution is blocked:
+This runs `python -m venv .venv`, upgrades pip **inside the venv**, installs `requirements.txt`, and copies `.env.example` to `.env` if needed.
+
+You do **not** need to activate the venv. Call the venv interpreter directly:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\smoke_test.py
+.\.venv\Scripts\python.exe run.py
+```
+
+### Manual equivalent
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+copy .env.example .env
+```
+
+If you want to activate anyway and `Activate.ps1` is blocked:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+.\.venv\Scripts\Activate.ps1
 ```
 
-Upgrade pip:
-
-```powershell
-python -m pip install --upgrade pip
-```
+**Do not** run `pip install -r requirements.txt` with Microsoft Store `python` outside `.venv`. That writes to a long `LocalCache\local-packages` path and PyTorch install fails with **WinError 206**.
 
 ---
 
-## 5. Install dependencies
+## 5. Optional face-recognition extras
+
+Core demo (detection + tracking + web UI) does **not** need TensorFlow.
 
 ```powershell
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-face.txt
 ```
 
 **First run notes:**
 
 - Ultralytics downloads `yolo11n.pt` automatically (~5 MB).
 - DeepFace downloads face model weights on first face recognition use (~100 MB).
-- Installation may take 5–15 minutes on Windows depending on network and CPU.
+- Core install may take several minutes (PyTorch). Face extras add TensorFlow and take longer.
 
 ---
 
@@ -210,7 +219,7 @@ VIDEO_SOURCE=C:/Users/Megam/Videos/campus.mp4
 Verifies YOLO download, person detection, and sample output:
 
 ```powershell
-python scripts\smoke_test.py
+.\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
 **Expected output:**
@@ -257,7 +266,7 @@ Lower = stricter matching.
 ## 9. Start the web demo
 
 ```powershell
-python run.py
+.\.venv\Scripts\python.exe run.py
 ```
 
 Open in a browser:
@@ -292,17 +301,40 @@ curl -X POST http://127.0.0.1:8765/api/source `
 
 | Test | Steps | Pass criteria |
 |------|--------|---------------|
-| Dependency install | `pip install -r requirements.txt` | No errors |
-| Model download | `python scripts\smoke_test.py` | `yolo11n.pt` present, persons detected |
-| Web server | `python run.py` | Page loads at port 8765 |
+| Dependency install | `.\scripts\setup.ps1` | No errors; `.venv` exists |
+| Model download | `.\.venv\Scripts\python.exe scripts\smoke_test.py` | `yolo11n.pt` present, persons detected |
+| Web server | `.\.venv\Scripts\python.exe run.py` | Page loads at port 8765 |
 | Webcam | Default `VIDEO_SOURCE=0` | Stream shows live video with boxes |
 | Video file | Set path in UI or `.env` | File plays with tracking IDs stable across frames |
-| Face ID | Add photos under `known_faces` | Known person labeled by name |
+| Face ID | Install `requirements-face.txt`, add photos under `known_faces` | Known person labeled by name |
 | Tracker swap | `TRACKER=botsort.yaml` in `.env` | Tracking still works after restart |
 
 ---
 
 ## 11. Troubleshooting
+
+### `py` is not recognized
+
+Use `python -m venv .venv` or `.\scripts\setup.ps1`. The Windows `py` launcher is not required.
+
+### `Activate.ps1` is not recognized
+
+The venv was never created (often because `py` failed first). Run `.\scripts\setup.ps1`, then use `.\.venv\Scripts\python.exe` instead of activating.
+
+### `ModuleNotFoundError: No module named 'ultralytics'`
+
+Dependencies were installed into Microsoft Store Python, not `.venv`. Re-run setup and launch with `.\.venv\Scripts\python.exe`.
+
+### `WinError 206` The filename or extension is too long
+
+PyTorch cannot install into Store Python’s user-site path. Use the project `.venv` (much shorter). If a venv install still fails, enable Windows long paths (admin PowerShell):
+
+```powershell
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+  -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+```
+
+Then reboot and retry `.\scripts\setup.ps1`.
 
 ### Webcam not opening
 
@@ -352,11 +384,14 @@ Yolo11-Human-Detection/
 │   ├── known_faces/         # Registered people
 │   └── sample/              # Smoke test images
 ├── scripts/
+│   ├── setup.ps1
+│   ├── setup.sh
 │   ├── smoke_test.py
 │   ├── setup-github.ps1
 │   ├── setup-github.sh
 │   └── yolo11-human-detection.bundle
 ├── requirements.txt
+├── requirements-face.txt
 ├── .env.example
 └── run.py
 ```
