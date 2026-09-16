@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+*.pt
+!data/sample/.gitkeep
+runs/
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.mp4
+*.avi
+*.mov
+deepface_weights/
