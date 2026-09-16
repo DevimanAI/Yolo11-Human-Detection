@@ -53,7 +53,90 @@ git pull origin cursor/yolo-human-detection-d5be
 
 ---
 
-## 3. Create virtual environment
+## 3. Publish to GitHub
+
+Use this path if **Origin HTTPS clone fails** (2FA / credential issues) or you want the project on **your GitHub account** instead of Origin.
+
+**Do not use Git username/password over HTTPS** — GitHub requires a personal access token or the **GitHub CLI browser login**, which works with 2FA.
+
+### Step A — Install and authenticate GitHub CLI
+
+1. Install [GitHub CLI](https://cli.github.com/) for Windows.
+2. In PowerShell:
+
+```powershell
+gh auth login
+```
+
+Choose:
+
+- **GitHub.com**
+- **HTTPS**
+- **Login with a web browser** (recommended; works with 2FA)
+
+### Step B — Get the project onto your PC
+
+**Option 1 — You already have the folder** (copied from cloud agent, USB, zip, etc.) with a `.git` directory:
+
+```powershell
+cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
+.\scripts\setup-github.ps1
+```
+
+**Option 2 — You only have the git bundle** (no `.git` yet). The bundle ships at `scripts\yolo11-human-detection.bundle` (< 1 MB, all branches):
+
+```powershell
+mkdir C:\Users\Megam\source\repos -Force
+cd C:\Users\Megam\source\repos
+# Copy the project folder here first, or download scripts\yolo11-human-detection.bundle into scripts\
+.\Yolo11-Human-Detection\scripts\setup-github.ps1 -TargetDir C:\Users\Megam\source\repos\Yolo11-Human-Detection
+```
+
+Or restore manually, then publish:
+
+```powershell
+git clone C:\path\to\scripts\yolo11-human-detection.bundle C:\Users\Megam\source\repos\Yolo11-Human-Detection
+cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
+.\scripts\setup-github.ps1
+```
+
+**Option 3 — Linux / macOS:**
+
+```bash
+./scripts/setup-github.sh --target-dir ~/source/repos/Yolo11-Human-Detection
+```
+
+### What the script does
+
+1. Verifies `gh` is installed and you ran `gh auth login`.
+2. Creates a **private** repo `Yolo11-Human-Detection` on your GitHub account.
+3. Adds remote `github` and pushes all branches.
+
+If remote `github` already exists, it only pushes updates.
+
+### After publishing
+
+Clone from GitHub on any machine (no Origin 2FA issues):
+
+```powershell
+git clone https://github.com/YOUR_USERNAME/Yolo11-Human-Detection.git C:\Users\Megam\source\repos\Yolo11-Human-Detection
+```
+
+Replace `YOUR_USERNAME` with your GitHub username.
+
+### Regenerate the bundle (maintainers)
+
+From repo root, if history changes and the bundle is not committed:
+
+```powershell
+git bundle create scripts/yolo11-human-detection.bundle --all
+```
+
+Include in git only if the file stays under 1 MB; otherwise document this command for users.
+
+---
+
+## 4. Create virtual environment
 
 ```powershell
 py -3.11 -m venv .venv
@@ -74,7 +157,7 @@ python -m pip install --upgrade pip
 
 ---
 
-## 4. Install dependencies
+## 5. Install dependencies
 
 ```powershell
 pip install -r requirements.txt
@@ -88,7 +171,7 @@ pip install -r requirements.txt
 
 ---
 
-## 5. Configure environment
+## 6. Configure environment
 
 ```powershell
 copy .env.example .env
@@ -122,7 +205,7 @@ VIDEO_SOURCE=C:/Users/Megam/Videos/campus.mp4
 
 ---
 
-## 6. Smoke test (no webcam required)
+## 7. Smoke test (no webcam required)
 
 Verifies YOLO download, person detection, and sample output:
 
@@ -142,7 +225,7 @@ Open the annotated image to confirm green boxes around people.
 
 ---
 
-## 7. Register known faces (optional)
+## 8. Register known faces (optional)
 
 1. Create a folder per person under `data\known_faces\`.
 2. Add 1–3 clear front-facing photos (`.jpg`, `.png`).
@@ -171,7 +254,7 @@ Lower = stricter matching.
 
 ---
 
-## 8. Start the web demo
+## 9. Start the web demo
 
 ```powershell
 python run.py
@@ -205,7 +288,7 @@ curl -X POST http://127.0.0.1:8765/api/source `
 
 ---
 
-## 9. Test matrix
+## 10. Test matrix
 
 | Test | Steps | Pass criteria |
 |------|--------|---------------|
@@ -219,7 +302,7 @@ curl -X POST http://127.0.0.1:8765/api/source `
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 ### Webcam not opening
 
@@ -255,7 +338,7 @@ PORT=8766
 
 ---
 
-## 11. Project structure reference
+## 12. Project structure reference
 
 ```
 Yolo11-Human-Detection/
@@ -269,7 +352,10 @@ Yolo11-Human-Detection/
 │   ├── known_faces/         # Registered people
 │   └── sample/              # Smoke test images
 ├── scripts/
-│   └── smoke_test.py
+│   ├── smoke_test.py
+│   ├── setup-github.ps1
+│   ├── setup-github.sh
+│   └── yolo11-human-detection.bundle
 ├── requirements.txt
 ├── .env.example
 └── run.py
@@ -277,13 +363,13 @@ Yolo11-Human-Detection/
 
 ---
 
-## 12. Stopping the server
+## 13. Stopping the server
 
 Press `Ctrl+C` in the terminal where `run.py` is running.
 
 ---
 
-## 13. Next steps for grading / demo
+## 14. Next steps for grading / demo
 
 1. Run smoke test and save `bus_detected.jpg` for the report.
 2. Record a short screen capture of the web UI with webcam or sample video.
