@@ -20,6 +20,7 @@ data/datasets/
 *.mp4
 *.avi
 *.mov
+.deepface/
 deepface_weights/
 /debug
 configs/.person_crowdhuman.generated.yaml

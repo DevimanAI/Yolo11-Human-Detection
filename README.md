@@ -12,7 +12,6 @@ Person detection (YOLO11), multi-object tracking (ByteTrack), optional face ID (
 | [docs/train-yolo.md](docs/train-yolo.md) | Fine-tune YOLO11 (1532+383 images) |
 | [docs/face-recognition.md](docs/face-recognition.md) | Register your face for recognition |
 | [docs/training-reference.md](docs/training-reference.md) | Hyperparameters & architecture (optional) |
-| [docs/thesis/](docs/thesis/) | Persian thesis draft |
 
 ---
 
@@ -60,7 +59,7 @@ DeepFace uses a **pretrained** model — you add photos, not train a CNN. Detail
 ## `.env` (common)
 
 ```ini
-YOLO_MODEL=yolo11n.pt
+YOLO_MODEL=docs/training_runs/person_yolo11n_20260923_165920/weights/best.pt
 TRACKER=bytetrack.yaml
 VIDEO_SOURCE=0
 CONFIDENCE=0.5
@@ -69,4 +68,4 @@ KNOWN_FACES_DIR=data/known_faces
 PORT=8765
 ```
 
-After training: `YOLO_MODEL=runs/detect/person_yolo11n/weights/best.pt`
+On startup, the log line `Loaded YOLO model ...` shows the exact weights file in use.

@@ -31,7 +31,7 @@ Scripts set cache paths under the project folder so you can delete the whole rep
 | `.cache/` | pip cache, torch hub, ultralytics weights cache |
 | `data/raw/`, `data/datasets/` | CrowdHuman download + YOLO dataset |
 | `runs/` | Training outputs |
-| `deepface_weights/` | DeepFace model weights |
+| `.deepface/` | DeepFace model weights |
 | `.kaggle/` | Optional Kaggle API token (copy here instead of `%USERPROFILE%`) |
 | `yolo11n.pt` | Downloaded base weights |
 

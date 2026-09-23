@@ -14,6 +14,7 @@ $Targets = @(
     "data\raw",
     "data\datasets",
     "runs",
+    ".deepface",
     "deepface_weights",
     "yolo11n.pt",
     "configs\.person_crowdhuman.generated.yaml"

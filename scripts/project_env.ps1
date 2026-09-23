@@ -19,7 +19,8 @@ function Set-ProjectEnvironment {
         (Join-Path $cache "ultralytics"),
         (Join-Path $cache "ultralytics\weights"),
         (Join-Path $cache "huggingface"),
-        (Join-Path $Root "deepface_weights"),
+        (Join-Path $Root ".deepface"),
+        (Join-Path $Root ".deepface\weights"),
         (Join-Path $Root "data\raw"),
         (Join-Path $Root "data\datasets"),
         (Join-Path $Root "runs"),
@@ -39,7 +40,7 @@ function Set-ProjectEnvironment {
     $env:TMP = $env:TEMP
     New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
 
-    $env:DEEPFACE_HOME = Join-Path $Root "deepface_weights"
+    $env:DEEPFACE_HOME = $Root
 
     $accessTokenFile = Join-Path $Root ".kaggle\access_token"
     if (-not $env:KAGGLE_API_TOKEN -and (Test-Path $accessTokenFile)) {

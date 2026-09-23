@@ -6,9 +6,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+from app.bootstrap import PROJECT_ROOT, apply_project_env
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+apply_project_env()
+load_dotenv()
 
 
 def _resolve_path(value: str) -> Path:
@@ -34,6 +35,13 @@ class Settings:
     face_model: str = os.getenv("FACE_MODEL", "Facenet512")
     host: str = os.getenv("HOST", "127.0.0.1")
     port: int = int(os.getenv("PORT", "8765"))
+
+    @property
+    def yolo_model_path(self) -> str:
+        path = Path(self.yolo_model)
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+        return str(path.resolve())
 
     @property
     def parsed_video_source(self) -> int | str:

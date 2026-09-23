@@ -22,7 +22,7 @@ def ensure_dirs() -> None:
         "data/datasets",
         "runs",
         ".kaggle",
-        "deepface_weights",
+        ".deepface/weights",
     ):
         (PROJECT_ROOT / rel).mkdir(parents=True, exist_ok=True)
 
@@ -34,7 +34,7 @@ def apply_env() -> None:
     os.environ.setdefault("TRANSFORMERS_CACHE", str(CACHE / "huggingface"))
     os.environ.setdefault("KAGGLE_CONFIG_DIR", str(PROJECT_ROOT / ".kaggle"))
     os.environ.setdefault("ULTRALYTICS_CONFIG_DIR", str(CACHE / "ultralytics"))
-    os.environ.setdefault("DEEPFACE_HOME", str(PROJECT_ROOT / "deepface_weights"))
+    os.environ.setdefault("DEEPFACE_HOME", str(PROJECT_ROOT))
     tmp = CACHE / "tmp"
     tmp.mkdir(parents=True, exist_ok=True)
     os.environ.setdefault("TEMP", str(tmp))

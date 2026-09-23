@@ -40,6 +40,8 @@ cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 .\.venv\Scripts\python.exe run.py
 ```
 
+Facenet512 weights (~95 MB) download once to `.deepface/weights/` **inside this repo** (not `%USERPROFILE%`). Let the first run finish; interrupting leaves a broken partial file.
+
 When your face is visible in the person box, the label should show **`Iman`** instead of `Unknown`.
 
 ---

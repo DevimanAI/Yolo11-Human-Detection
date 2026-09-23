@@ -21,7 +21,7 @@ class VideoPipeline:
     def __init__(self, cfg: Settings | None = None) -> None:
         self.cfg = cfg or settings
         self.detector = HumanDetectorTracker(
-            model_path=self.cfg.yolo_model,
+            model_path=self.cfg.yolo_model_path,
             tracker=self.cfg.tracker,
             confidence=self.cfg.confidence,
         )

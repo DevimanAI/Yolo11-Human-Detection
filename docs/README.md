@@ -1,6 +1,6 @@
 # Documentation index
 
-Start here. Persian thesis files stay in [`thesis/`](thesis/) only.
+Start here for setup, training, and the live demo.
 
 ---
 
@@ -51,7 +51,6 @@ Details: [face-recognition.md](face-recognition.md)
 | [train-yolo.md](train-yolo.md) | Dataset, fine-tune, use `best.pt` in the app |
 | [face-recognition.md](face-recognition.md) | Register your face, tune matching threshold |
 | [training-reference.md](training-reference.md) | Hyperparameters, YOLO11 architecture, defense Q&A |
-| [thesis/](thesis/) | Persian thesis draft (unchanged) |
 
 ---
 
