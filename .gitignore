@@ -11,6 +11,7 @@ venv/
 runs/
 data/raw/
 data/datasets/
+data/known_faces/Iman/
 !docs/training_runs/
 !docs/training_runs/**/*
 .DS_Store
