@@ -21,3 +21,4 @@ data/datasets/
 deepface_weights/
 /debug
 configs/.person_crowdhuman.generated.yaml
+Yolov4 Darknet/

@@ -18,7 +18,7 @@ if (-not $python) {
 
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) {
-    Write-Info "No .venv found — running setup.ps1 first..."
+    Write-Info "No .venv found - running setup.ps1 first..."
     & (Join-Path $ProjectRoot "scripts\setup.ps1")
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
@@ -29,15 +29,7 @@ Write-Info "Installing training requirements..."
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Info "Checking CUDA / GPU availability..."
-& $VenvPython -c @"
-import torch
-cuda = torch.cuda.is_available()
-print('CUDA available:', cuda)
-if cuda:
-    print('GPU:', torch.cuda.get_device_name(0))
-else:
-    print('Training will run on CPU (slower). Use --epochs 5 --max-images 200 for smoke training.')
-"@
+& $VenvPython -c "import torch; c=torch.cuda.is_available(); print('CUDA available:', c); print('GPU:', torch.cuda.get_device_name(0)) if c else print('Training will run on CPU (slower).')"
 
 Write-Ok "Training environment ready."
 Write-Host ""
@@ -46,4 +38,4 @@ Write-Host "  .\scripts\download_dataset.ps1"
 Write-Host "  .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py"
 Write-Host "  .\scripts\train_yolo11.ps1"
 Write-Host ""
-Write-Host "Docs: docs\README.md  |  Train: docs\train-yolo.md  |  Face: docs\face-recognition.md"
+Write-Host "Docs: docs\README.md (see train-yolo.md and face-recognition.md)"
