@@ -143,16 +143,28 @@ BoT-SORT ترکیبی از فیلتر کالman و اطلاعات ظاهری (Re
 
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
+.\scripts\setup.ps1
 ```
+
+### آموزش مدل (fine-tune)
+
+مجموعه **CASIA Tampering** برای تشخیص دستکاری تصویر است، نه bounding box انسان. برای آموزش YOLO از **CrowdHuman** استفاده می‌شود.
+
+```powershell
+.\scripts\setup-train.ps1
+.\scripts\download_dataset.ps1
+.\.venv\Scripts\python.exe scripts\convert_crowdhuman.py
+.\scripts\train_yolo11.ps1
+```
+
+راهنما: `docs/training-guide.md` — پارامترها: `docs/training-params-defense-fa.md` — پایان‌نامه: `docs/thesis/`
+
+**YOLO11 anchor-free است** (برخلاف YOLOv5). مدل اپ: `yolo11n.pt`، کلاس person با id=0.
 
 ### تست بدون وب‌کم
 
 ```powershell
-python scripts\smoke_test.py
+.\.venv\Scripts\python.exe scripts\smoke_test.py
 ```
 
 خروجی: تصویر `data\sample\bus_detected.jpg` با جعبه‌های تشخیص اطراف افراد.
@@ -160,7 +172,7 @@ python scripts\smoke_test.py
 ### اجرای دمو وب
 
 ```powershell
-python run.py
+.\.venv\Scripts\python.exe run.py
 ```
 
 مرورگر: **http://127.0.0.1:8765**
@@ -181,6 +193,14 @@ python run.py
 ## نتیجه‌گیری
 
 این پروژه یک pipeline عملی برای **تشخیص انسان با YOLO**، **ردیابی چند شیء** و **شناسایی چهره** ارائه می‌دهد که هم الزامات درسی (استفاده از YOLO از پیش آموزش‌دیده) را برآورده می‌کند و هم با لایه تشخیص چهره و رابط وب، برای ارائه دانشگاهی مناسب است. معماری ماژولار امکان تعویض tracker، مدل YOLO یا غیرفعال کردن face recognition را بدون تغییر اساسی فراهم می‌کند.
+
+---
+
+## آموزش و ارزیابی
+
+- Smoke train (mini dataset): mAP50 ≈ 0.28 پس از 3 epoch — فقط تست pipeline  
+- Train کامل: 50 epoch روی CrowdHuman — metrics در `docs/training_runs/`  
+- Export: `scripts/export_metrics.py`
 
 ---
 

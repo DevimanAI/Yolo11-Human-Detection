@@ -1,0 +1,7 @@
+# Training extras — install after requirements.txt inside .venv:
+#   .\.venv\Scripts\python.exe -m pip install -r requirements-train.txt
+-r requirements.txt
+kaggle>=1.6.0
+pandas>=2.0.0
+pyyaml>=6.0
+tensorboard>=2.16.0

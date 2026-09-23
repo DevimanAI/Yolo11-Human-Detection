@@ -49,6 +49,37 @@ Optional face recognition (heavy: TensorFlow + DeepFace):
 Full run/test guide: [docs/run-and-test.md](docs/run-and-test.md)  
 Persian project article: [docs/project-article-fa.md](docs/project-article-fa.md)
 
+## Training (fine-tune YOLO11 on person data)
+
+The app ships with **pretrained** `yolo11n.pt` (COCO). To train on a person dataset (CrowdHuman — **not** the unrelated [CASIA tampering dataset](https://www.kaggle.com/datasets/divg07/casia-20-image-tampering-detection-dataset)):
+
+```powershell
+.\scripts\setup-train.ps1
+.\scripts\download_dataset.ps1
+.\.venv\Scripts\python.exe scripts\convert_crowdhuman.py
+.\scripts\train_yolo11.ps1
+```
+
+Smoke pipeline only (no Kaggle): `convert_crowdhuman.py --mini` then `train_yolo11.ps1 -Epochs 3`
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/training-guide.md](docs/training-guide.md) | Step-by-step runbook |
+| [docs/training-params-defense-fa.md](docs/training-params-defense-fa.md) | Persian defense Q&A (hyperparams, anchors, CNN) |
+| [docs/deepface-gallery-fa.md](docs/deepface-gallery-fa.md) | Face gallery setup |
+| [docs/thesis/](docs/thesis/) | ~40-page Persian thesis draft |
+
+### Model specification (inference app)
+
+| Item | Value |
+|------|-------|
+| Architecture | YOLO11n (Ultralytics), **anchor-free** Detect head |
+| Pretrained weights | `yolo11n.pt` — COCO, class `person` = id 0 |
+| Input (train default) | 640×640 |
+| Params | ~2.6M (nano) |
+| Tracking | ByteTrack / BoT-SORT (not part of detector training) |
+| Face ID | DeepFace Facenet512 — pretrained gallery (optional) |
+
 ## Quick start (Linux / macOS)
 
 ```bash
@@ -83,8 +114,18 @@ data/
   sample/             # Smoke-test output
 scripts/
   setup.ps1           # Windows venv + pip install
+  setup-train.ps1     # Training deps + GPU check
+  download_dataset.ps1
+  convert_crowdhuman.py
+  train_yolo11.ps1
+  export_metrics.py
+  build_face_gallery.py
   smoke_test.py       # Download sample + verify detection
+configs/
+  person_crowdhuman.yaml
+  train_yolo11n.yaml
 requirements.txt      # Core demo (no TensorFlow)
+requirements-train.txt
 requirements-face.txt # Optional DeepFace extras
 .env.example
 run.py

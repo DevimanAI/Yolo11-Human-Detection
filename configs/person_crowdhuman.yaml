@@ -1,0 +1,11 @@
+# Ultralytics dataset config — single-class person (CrowdHuman conversion output)
+# Paths are relative to this file's directory (repo root when training from root).
+
+# path is rewritten to an absolute path by scripts/train_yolo11.py before training.
+path: data/datasets/person_crowdhuman
+train: images/train
+val: images/val
+
+nc: 1
+names:
+  0: person

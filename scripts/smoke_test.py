@@ -44,13 +44,20 @@ def download_sample() -> Path:
 
 
 def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Smoke test person detection")
+    parser.add_argument("--model", default="yolo11n.pt", help="YOLO weights path")
+    parser.add_argument("--confidence", type=float, default=0.4)
+    args = parser.parse_args()
+
     image_path = download_sample()
     frame = cv2.imread(str(image_path))
     if frame is None:
         print(f"ERROR: Could not read sample image at {image_path}")
         return 1
 
-    detector = HumanDetectorTracker("yolo11n.pt", "bytetrack.yaml", confidence=0.4)
+    detector = HumanDetectorTracker(args.model, "bytetrack.yaml", confidence=args.confidence)
     people = detector.process_frame(frame)
     annotated = detector.draw_annotations(frame, people)
 
