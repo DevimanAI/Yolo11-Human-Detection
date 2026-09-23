@@ -8,12 +8,47 @@ Fine-tune **YOLO11n** (`yolo11n.pt`, pretrained on COCO) on pedestrian boxes fro
 
 ---
 
+## GPU training (CUDA)
+
+You have an **NVIDIA GPU** (e.g. RTX 4060). You do **not** need to install the full [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) separately.
+
+| Requirement | Notes |
+|-------------|--------|
+| NVIDIA driver | Already installed if `nvidia-smi` works |
+| CUDA PyTorch | Installed automatically by `setup-train.ps1` into `.venv` |
+
+Training on GPU is **much faster** than CPU (often 10–50× for YOLO fine-tuning). After setup, you should see `CUDA available: True`.
+
+---
+
+## Everything stays inside this repo
+
+Scripts set cache paths under the project folder so you can delete the whole repo after your defense:
+
+| Path | Contents |
+|------|----------|
+| `.venv/` | Python packages (PyTorch, Ultralytics, …) |
+| `.cache/` | pip cache, torch hub, ultralytics weights cache |
+| `data/raw/`, `data/datasets/` | CrowdHuman download + YOLO dataset |
+| `runs/` | Training outputs |
+| `deepface_weights/` | DeepFace model weights |
+| `.kaggle/` | Optional Kaggle API token (copy here instead of `%USERPROFILE%`) |
+| `yolo11n.pt` | Downloaded base weights |
+
+Remove all of the above:
+
+```powershell
+.\scripts\cleanup-all.ps1
+```
+
+---
+
 ## Quick steps (Windows)
 
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 
-# 1. Environment
+# 1. Environment (+ GPU PyTorch if NVIDIA detected)
 .\scripts\setup-train.ps1
 
 # 2. Download raw CrowdHuman (Kaggle — see below for credentials)
@@ -39,21 +74,27 @@ cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 | Train | 2000 | `--max-train 2000` (default) |
 | Val | 500 | `--max-val 500` (default) |
 
-Kaggle still downloads the **full archive** (~5 GB). The convert step copies only **2500 labeled images** into `data/datasets/person_crowdhuman/` (~hundreds of MB).
+The download script fetches **annotations + 2500 images only** (~1–2 GB), not the full **11 GB** Kaggle archive ([leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman)).
+
+Convert copies those into `data/datasets/person_crowdhuman/` for training.
 
 Free disk after convert:
 
 ```powershell
-Remove-Item -Recurse -Force data\raw\crowdhuman
+Remove-Item -Recurse -Force data\raw\crowdhuman\Images, data\raw\crowdhuman\Images_val
 ```
+
+Full 11 GB archive (optional): `.\scripts\download_dataset.ps1 -Full`
 
 ---
 
 ## Kaggle setup (one time)
 
-1. https://www.kaggle.com/settings → **Create New Token**
-2. Save as `%USERPROFILE%\.kaggle\kaggle.json`
-3. On the dataset page, click **Download** once to accept the license
+1. Open https://www.kaggle.com/settings/api
+2. **New token (`KGAT_...`):** copy it into `.kaggle\access_token` inside this repo (one line, no quotes)
+   - Or set `KAGGLE_API_TOKEN=...` in `.env`
+3. **Legacy key only:** use "Create Legacy API Key" and save as `.kaggle\kaggle.json` with `username` + `key`
+4. Open [leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman) and click **Download** once to accept the license
 
 ---
 

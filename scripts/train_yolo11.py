@@ -13,7 +13,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.env_check import abort_if_missing  # noqa: E402
+from scripts.configure_project import apply_env, configure_ultralytics, ensure_dirs  # noqa: E402
 
+ensure_dirs()
+apply_env()
+configure_ultralytics()
 abort_if_missing()
 
 

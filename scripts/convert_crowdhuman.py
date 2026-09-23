@@ -35,13 +35,27 @@ def find_odgt_files(raw_root: Path) -> tuple[Path | None, Path | None]:
     return train, val
 
 
-def find_image(raw_root: Path, filepath: str) -> Path | None:
-    filename = Path(filepath).name
-    for candidate in (
-        raw_root / "Images" / filename,
-        raw_root / "images" / filename,
-        raw_root / filename,
-    ):
+def image_filename(filepath_or_id: str) -> str:
+    name = Path(filepath_or_id).name
+    if not name.lower().endswith((".jpg", ".jpeg", ".png")):
+        return f"{name}.jpg"
+    return name
+
+
+def find_image(raw_root: Path, filepath: str, split: str | None = None) -> Path | None:
+    filename = image_filename(filepath)
+    split_folders = ("Images_val", "images_val") if split == "val" else ("Images", "images")
+    search_roots = [raw_root, raw_root / "CrowdHuman"]
+    for root in search_roots:
+        for folder in split_folders:
+            candidate = root / folder / filename
+            if candidate.exists():
+                return candidate
+        for folder in ("Images", "images", "Images_val", "images_val"):
+            candidate = root / folder / filename
+            if candidate.exists():
+                return candidate
+        candidate = root / filename
         if candidate.exists():
             return candidate
     matches = list(raw_root.rglob(filename))
@@ -63,21 +77,18 @@ def box_to_yolo(box: list[float], width: int, height: int) -> tuple[float, float
     return x_center, y_center, norm_w, norm_h
 
 
-def parse_record(record: dict) -> tuple[str, int, int, list[tuple[float, float, float, float]]]:
-    filepath = record["filepath"]
-    width = int(record["width"])
-    height = int(record["height"])
-    boxes: list[tuple[float, float, float, float]] = []
+def parse_record(record: dict) -> tuple[str, int | None, int | None, list[list[float]]]:
+    filepath = record.get("filepath") or f"{record['ID']}.jpg"
+    width = int(record["width"]) if record.get("width") is not None else None
+    height = int(record["height"]) if record.get("height") is not None else None
+    raw_boxes: list[list[float]] = []
     for gt in record.get("gtboxes", []):
         if gt.get("tag") not in {"person", "mask"}:
             continue
         raw_box = gt.get("vbox") or gt.get("fbox") or gt.get("hbox")
-        if raw_box is None:
-            continue
-        yolo_box = box_to_yolo(raw_box, width, height)
-        if yolo_box is not None:
-            boxes.append(yolo_box)
-    return filepath, width, height, boxes
+        if raw_box is not None:
+            raw_boxes.append(raw_box)
+    return filepath, width, height, raw_boxes
 
 
 def convert_split(
@@ -109,12 +120,30 @@ def convert_split(
     saved = 0
     skipped = 0
     for record in records:
-        filepath, _width, _height, boxes = parse_record(record)
-        if not boxes:
+        filepath, width, height, raw_boxes = parse_record(record)
+        if not raw_boxes:
             skipped += 1
             continue
-        source = find_image(raw_root, filepath)
+        source = find_image(raw_root, filepath, split=split)
         if source is None:
+            skipped += 1
+            continue
+
+        if width is None or height is None:
+            import cv2
+
+            frame = cv2.imread(str(source))
+            if frame is None:
+                skipped += 1
+                continue
+            height, width = frame.shape[:2]
+
+        boxes = [
+            yolo
+            for raw in raw_boxes
+            if (yolo := box_to_yolo(raw, width, height)) is not None
+        ]
+        if not boxes:
             skipped += 1
             continue
 

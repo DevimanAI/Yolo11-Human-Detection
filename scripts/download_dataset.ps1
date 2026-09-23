@@ -1,24 +1,68 @@
-# Download CrowdHuman dataset for person-detection fine-tuning.
-# Requires Kaggle API credentials in %USERPROFILE%\.kaggle\kaggle.json
-# or env vars KAGGLE_USERNAME / KAGGLE_KEY.
+# Download CrowdHuman for person-detection fine-tuning.
+# Default: annotations + 2500 images only (~1-2 GB), NOT the full 11 GB Kaggle archive.
 #
 # Usage: .\scripts\download_dataset.ps1
-# Optional: .\scripts\download_dataset.ps1 -DatasetSlug "nkk754/crowdhuman-crowd-human-detection-dataset"
+# Full archive: .\scripts\download_dataset.ps1 -Full
 
 param(
-    [string]$DatasetSlug = "nkk754/crowdhuman-crowd-human-detection-dataset"
+    [string]$DatasetSlug = "leducnhuan/crowdhuman",
+    [int]$MaxTrain = 2000,
+    [int]$MaxVal = 500,
+    [switch]$Full
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $ProjectRoot
+. (Join-Path $PSScriptRoot "project_env.ps1") -ProjectRoot $ProjectRoot
 
 function Write-Info([string]$Message) { Write-Host $Message -ForegroundColor Cyan }
 function Write-Warn([string]$Message) { Write-Host $Message -ForegroundColor Yellow }
 function Write-Ok([string]$Message) { Write-Host $Message -ForegroundColor Green }
 
-$RawRoot = Join-Path $ProjectRoot "data\raw\crowdhuman"
-New-Item -ItemType Directory -Force -Path $RawRoot | Out-Null
+$KaggleDir = Join-Path $ProjectRoot ".kaggle"
+$KaggleJson = Join-Path $KaggleDir "kaggle.json"
+$AccessTokenFile = Join-Path $KaggleDir "access_token"
+New-Item -ItemType Directory -Force -Path $KaggleDir | Out-Null
+
+$EnvFile = Join-Path $ProjectRoot ".env"
+if (Test-Path $EnvFile) {
+    Get-Content $EnvFile | ForEach-Object {
+        if ($_ -match '^\s*KAGGLE_API_TOKEN\s*=\s*(.+)\s*$') { $env:KAGGLE_API_TOKEN = $Matches[1].Trim() }
+        if ($_ -match '^\s*KAGGLE_USERNAME\s*=\s*(.+)\s*$') { $env:KAGGLE_USERNAME = $Matches[1].Trim() }
+        if ($_ -match '^\s*KAGGLE_KEY\s*=\s*(.+)\s*$') { $env:KAGGLE_KEY = $Matches[1].Trim() }
+    }
+}
+
+if ($env:KAGGLE_API_TOKEN -and -not (Test-Path $AccessTokenFile)) {
+    Set-Content -Path $AccessTokenFile -Value $env:KAGGLE_API_TOKEN.Trim() -Encoding ASCII -NoNewline
+    Write-Info "Created .kaggle\access_token from .env"
+}
+
+if (-not $env:KAGGLE_API_TOKEN -and (Test-Path $AccessTokenFile)) {
+    $env:KAGGLE_API_TOKEN = (Get-Content $AccessTokenFile -Raw).Trim()
+}
+
+if ($env:KAGGLE_USERNAME -and $env:KAGGLE_KEY -and -not (Test-Path $KaggleJson)) {
+    $payload = @{ username = $env:KAGGLE_USERNAME; key = $env:KAGGLE_KEY } | ConvertTo-Json -Compress
+    Set-Content -Path $KaggleJson -Value $payload -Encoding UTF8
+    Write-Info "Created .kaggle\kaggle.json from .env (legacy credentials)"
+}
+
+if (-not $env:KAGGLE_API_TOKEN -and -not (Test-Path $KaggleJson)) {
+    $userToken = Join-Path $env:USERPROFILE ".kaggle\access_token"
+    $userKaggle = Join-Path $env:USERPROFILE ".kaggle\kaggle.json"
+    if (Test-Path $userToken) {
+        Copy-Item $userToken $AccessTokenFile
+        $env:KAGGLE_API_TOKEN = (Get-Content $AccessTokenFile -Raw).Trim()
+        Write-Info "Copied access_token from $env:USERPROFILE\.kaggle\"
+    } elseif (Test-Path $userKaggle) {
+        Copy-Item $userKaggle $KaggleJson
+        Write-Info "Copied kaggle.json from $env:USERPROFILE\.kaggle\"
+    }
+}
+
+$env:KAGGLE_CONFIG_DIR = $KaggleDir
 
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) {
@@ -26,44 +70,43 @@ if (-not (Test-Path $VenvPython)) {
     exit 1
 }
 
-$kaggle = Get-Command kaggle -ErrorAction SilentlyContinue
-if (-not $kaggle) {
-    Write-Info "Installing kaggle CLI in venv..."
-    & $VenvPython -m pip install kaggle
-    $kaggleCmd = Join-Path $ProjectRoot ".venv\Scripts\kaggle.exe"
+Write-Info "Dataset: $DatasetSlug"
+if ($Full) {
+    Write-Warn "Full mode: downloading entire Kaggle archive (~11 GB)."
 } else {
-    $kaggleCmd = "kaggle"
+    Write-Info "Subset mode: annotations + $MaxTrain train + $MaxVal val images (not 11 GB)."
+    Write-Host "  Accept license once: https://www.kaggle.com/datasets/leducnhuan/crowdhuman"
 }
 
-if (-not (Test-Path $kaggleCmd) -and $kaggle) {
-    $kaggleCmd = "kaggle"
-}
+$Args = @(
+    (Join-Path $ProjectRoot "scripts\download_crowdhuman_subset.py"),
+    "--slug", $DatasetSlug,
+    "--max-train", $MaxTrain,
+    "--max-val", $MaxVal
+)
+if ($Full) { $Args += "--full" }
 
-Write-Info "Downloading Kaggle dataset: $DatasetSlug"
-Write-Info "Target: $RawRoot"
-
-& $kaggleCmd datasets download -d $DatasetSlug -p $RawRoot --unzip
+& $VenvPython @Args
 if ($LASTEXITCODE -ne 0) {
-    Write-Warn "Kaggle download failed."
+    Write-Warn "Download failed."
     Write-Host ""
-    Write-Host "Setup Kaggle credentials:"
-    Write-Host "  1. Create API token at https://www.kaggle.com/settings"
-    Write-Host "  2. Save kaggle.json to $env:USERPROFILE\.kaggle\kaggle.json"
-    Write-Host "  3. Or set KAGGLE_USERNAME and KAGGLE_KEY in .env"
+    Write-Host "Setup Kaggle credentials (inside this repo):"
+    Write-Host "  New token (KGAT_...): save to .kaggle\access_token"
+    Write-Host "  Or set KAGGLE_API_TOKEN=... in .env"
     Write-Host ""
-    Write-Host "Manual alternative:"
-    Write-Host "  - Download CrowdHuman from https://www.crowdhuman.org/"
-    Write-Host "  - Extract Images + annotation_train.odgt + annotation_val.odgt into data\raw\crowdhuman\"
+    Write-Host "If you see 403 Forbidden:"
+    Write-Host "  - Open https://www.kaggle.com/datasets/leducnhuan/crowdhuman"
+    Write-Host "  - Click Download once to accept the dataset license"
     Write-Host ""
-    Write-Host "Smoke training without full dataset:"
+    Write-Host "Smoke training without CrowdHuman:"
     Write-Host "  .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py --mini"
     exit 1
 }
 
 Write-Ok "Download complete."
 Write-Host ""
-Write-Host "Next (keeps 2000 train + 500 val only — not the full 5 GB in YOLO folder):"
+Write-Host "Next:"
 Write-Host "  .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py"
 Write-Host ""
-Write-Host "Optional — delete raw download after convert to free ~5 GB:"
-Write-Host "  Remove-Item -Recurse -Force data\raw\crowdhuman"
+Write-Host "Optional: delete raw images after convert (keep annotations if re-converting):"
+Write-Host "  Remove-Item -Recurse -Force data\raw\crowdhuman\Images, data\raw\crowdhuman\Images_val"

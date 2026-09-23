@@ -12,6 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $ProjectRoot
+. (Join-Path $PSScriptRoot "project_env.ps1") -ProjectRoot $ProjectRoot
 
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) {

@@ -25,7 +25,7 @@ Open http://127.0.0.1:8765
 .\scripts\train_yolo11.ps1
 ```
 
-Uses **2000 train + 500 val** images (not the full 5 GB set). Details: [train-yolo.md](train-yolo.md)
+Uses **2000 train + 500 val** images from [leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman) (~1–2 GB subset, not 11 GB). Details: [train-yolo.md](train-yolo.md)
 
 ### C. Recognize your face (DeepFace)
 
@@ -68,3 +68,6 @@ Details: [face-recognition.md](face-recognition.md)
 | `build_face_gallery.py` | Verify DeepFace gallery |
 | `smoke_test.py` | Test detection on sample bus image |
 | `run.py` | Start web demo |
+| `cleanup-all.ps1` | Delete `.venv`, datasets, caches (after defense) |
+
+All downloads and caches stay under this repo (`.venv`, `.cache`, `data/`, `runs/`). See [train-yolo.md](train-yolo.md#everything-stays-inside-this-repo).

@@ -4,6 +4,7 @@
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $ProjectRoot
+. (Join-Path $PSScriptRoot "project_env.ps1") -ProjectRoot $ProjectRoot
 
 function Write-Info([string]$Message) { Write-Host $Message -ForegroundColor Cyan }
 function Write-Ok([string]$Message) { Write-Host $Message -ForegroundColor Green }
@@ -28,8 +29,28 @@ Write-Info "Installing training requirements..."
 & $VenvPython -m pip install -r (Join-Path $ProjectRoot "requirements-train.txt")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-Write-Info "Checking CUDA / GPU availability..."
-& $VenvPython -c "import torch; c=torch.cuda.is_available(); print('CUDA available:', c); print('GPU:', torch.cuda.get_device_name(0)) if c else print('Training will run on CPU (slower).')"
+$hasNvidia = $false
+try {
+    $null = Get-Command nvidia-smi -ErrorAction Stop
+    $smi = & nvidia-smi 2>&1
+    if ($LASTEXITCODE -eq 0) { $hasNvidia = $true }
+} catch {
+    $hasNvidia = $false
+}
+
+if ($hasNvidia) {
+    Write-Info "NVIDIA GPU detected - installing CUDA PyTorch (driver only, not full CUDA Toolkit)."
+    Write-Host "  The PyTorch wheel bundles CUDA runtime libraries."
+    & $VenvPython -m pip uninstall -y torch torchvision torchaudio | Out-Null
+    & $VenvPython -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+} else {
+    Write-Warn "No NVIDIA GPU detected - training will use CPU (much slower)."
+}
+
+Write-Info "Pinning Ultralytics / cache paths to this repo..."
+& $VenvPython (Join-Path $ProjectRoot "scripts\configure_project.py")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Ok "Training environment ready."
 Write-Host ""

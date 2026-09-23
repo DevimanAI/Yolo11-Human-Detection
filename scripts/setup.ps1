@@ -5,6 +5,7 @@
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $ProjectRoot
+. (Join-Path $PSScriptRoot "project_env.ps1") -ProjectRoot $ProjectRoot
 
 function Write-Info([string]$Message) { Write-Host $Message -ForegroundColor Cyan }
 function Write-Ok([string]$Message) { Write-Host $Message -ForegroundColor Green }
