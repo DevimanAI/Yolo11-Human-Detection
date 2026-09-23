@@ -10,7 +10,6 @@
   <main class="layout">
     <header class="hero">
       <div>
-        <p class="eyebrow">University Project Demo</p>
         <h1>Human Detection, Tracking & Face Recognition</h1>
         <p class="subtitle">
           Ultralytics YOLO person detection with ByteTrack/BoT-SORT and optional DeepFace identification.
@@ -30,6 +29,16 @@
       </div>
     </section>
 
+        <section class="panel info">
+      <h2>Configuration</h2>
+      <ul>
+        <li><strong>Model:</strong> {{ settings.yolo_model }}</li>
+        <li><strong>Tracker:</strong> {{ settings.tracker }}</li>
+        <li><strong>Confidence:</strong> {{ settings.confidence }}</li>
+        <li><strong>Known faces:</strong> {{ settings.known_faces_dir }}</li>
+      </ul>
+    </section>
+    
     <section class="panel controls">
       <h2>Source</h2>
       <form id="source-form">
@@ -39,19 +48,9 @@
           <button type="submit">Apply</button>
         </div>
         <p class="hint">Default webcam is index <code>0</code>. Use a full path for a video file on Windows, e.g. <code>C:\Users\Megam\Videos\sample.mp4</code>.</p>
-      </form>
-      <p id="message" class="message" hidden></p>
-    </section>
-
-    <section class="panel info">
-      <h2>Configuration</h2>
-      <ul>
-        <li><strong>Model:</strong> {{ settings.yolo_model }}</li>
-        <li><strong>Tracker:</strong> {{ settings.tracker }}</li>
-        <li><strong>Confidence:</strong> {{ settings.confidence }}</li>
-        <li><strong>Known faces:</strong> {{ settings.known_faces_dir }}</li>
-      </ul>
-    </section>
+    </form>
+    <p id="message" class="message" hidden></p>
+  </section>
   </main>
 
   <script src="/static/app.js"></script>
