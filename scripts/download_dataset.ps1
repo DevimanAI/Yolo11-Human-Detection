@@ -6,8 +6,8 @@
 
 param(
     [string]$DatasetSlug = "leducnhuan/crowdhuman",
-    [int]$MaxTrain = 2000,
-    [int]$MaxVal = 500,
+    [int]$MaxTrain = 1532,
+    [int]$MaxVal = 383,
     [switch]$Full
 )
 

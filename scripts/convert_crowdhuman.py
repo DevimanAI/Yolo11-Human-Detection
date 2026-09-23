@@ -15,6 +15,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 RAW_ROOT = PROJECT_ROOT / "data" / "raw" / "crowdhuman"
 OUTPUT_ROOT = PROJECT_ROOT / "data" / "datasets" / "person_crowdhuman"
+DEFAULT_MAX_TRAIN = 1532
+DEFAULT_MAX_VAL = 383  # 1532 + 383 = 1915 (typical subset after Kaggle rate limits)
 
 
 def find_odgt_files(raw_root: Path) -> tuple[Path | None, Path | None]:
@@ -91,6 +93,14 @@ def parse_record(record: dict) -> tuple[str, int | None, int | None, list[list[f
     return filepath, width, height, raw_boxes
 
 
+def count_downloaded_images(raw_root: Path, split: str) -> int:
+    folder = "Images_val" if split == "val" else "Images"
+    image_dir = raw_root / folder
+    if not image_dir.exists():
+        return 0
+    return sum(1 for path in image_dir.iterdir() if path.suffix.lower() in {".jpg", ".jpeg", ".png"})
+
+
 def convert_split(
     odgt_path: Path,
     raw_root: Path,
@@ -98,7 +108,8 @@ def convert_split(
     output_root: Path,
     max_images: int | None,
     seed: int,
-) -> tuple[int, int]:
+    exclude_stems: set[str] | None = None,
+) -> tuple[int, int, set[str]]:
     image_dir = output_root / "images" / split
     label_dir = output_root / "labels" / split
     image_dir.mkdir(parents=True, exist_ok=True)
@@ -114,12 +125,13 @@ def convert_split(
 
     rng = random.Random(seed)
     rng.shuffle(records)
-    if max_images is not None:
-        records = records[:max_images]
 
     saved = 0
     skipped = 0
+    saved_stems: set[str] = set()
     for record in records:
+        if max_images is not None and saved >= max_images:
+            break
         filepath, width, height, raw_boxes = parse_record(record)
         if not raw_boxes:
             skipped += 1
@@ -148,6 +160,10 @@ def convert_split(
             continue
 
         stem = Path(filepath).stem
+        if exclude_stems and stem in exclude_stems:
+            skipped += 1
+            continue
+
         dest_image = image_dir / f"{stem}{source.suffix.lower()}"
         dest_label = label_dir / f"{stem}.txt"
 
@@ -155,8 +171,9 @@ def convert_split(
         lines = [f"0 {xc:.6f} {yc:.6f} {w:.6f} {h:.6f}" for xc, yc, w, h in boxes]
         dest_label.write_text("\n".join(lines) + "\n", encoding="utf-8")
         saved += 1
+        saved_stems.add(stem)
 
-    return saved, skipped
+    return saved, skipped, saved_stems
 
 
 def build_mini_from_sample(output_root: Path) -> int:
@@ -210,8 +227,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Convert CrowdHuman to YOLO person dataset")
     parser.add_argument("--raw-root", type=Path, default=RAW_ROOT)
     parser.add_argument("--output-root", type=Path, default=OUTPUT_ROOT)
-    parser.add_argument("--max-train", type=int, default=2000, help="Max train images (default 2000)")
-    parser.add_argument("--max-val", type=int, default=500, help="Max val images (default 500)")
+    parser.add_argument(
+        "--max-train",
+        type=int,
+        default=DEFAULT_MAX_TRAIN,
+        help=f"Max train images (default {DEFAULT_MAX_TRAIN})",
+    )
+    parser.add_argument(
+        "--max-val",
+        type=int,
+        default=DEFAULT_MAX_VAL,
+        help=f"Max val images (default {DEFAULT_MAX_VAL})",
+    )
     parser.add_argument("--mini", action="store_true", help="Build tiny pseudo-labeled set from bus.jpg")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -232,15 +259,33 @@ def main() -> int:
         shutil.rmtree(args.output_root)
     args.output_root.mkdir(parents=True, exist_ok=True)
 
-    train_saved, train_skipped = convert_split(
+    train_saved, train_skipped, train_stems = convert_split(
         train_odgt, args.raw_root, "train", args.output_root, args.max_train, args.seed
     )
-    val_saved, val_skipped = convert_split(
-        val_odgt, args.raw_root, "val", args.output_root, args.max_val, args.seed + 1
+
+    val_source = val_odgt
+    val_seed = args.seed + 1
+    if count_downloaded_images(args.raw_root, "val") < max(10, args.max_val // 4):
+        print(
+            "Note: few val images in Images_val/ (Kaggle rate limits) — "
+            "building val split from train annotations instead."
+        )
+        val_source = train_odgt
+        val_seed = args.seed + 101
+
+    val_saved, val_skipped, _val_stems = convert_split(
+        val_source,
+        args.raw_root,
+        "val",
+        args.output_root,
+        args.max_val,
+        val_seed,
+        exclude_stems=train_stems,
     )
 
     print(f"Train: saved={train_saved} skipped={train_skipped} (limit {args.max_train})")
     print(f"Val:   saved={val_saved} skipped={val_skipped} (limit {args.max_val})")
+    print(f"Total: {train_saved + val_saved} images ready for training")
     print(f"YOLO dataset -> {args.output_root}")
     print(f"Config -> configs/person_crowdhuman.yaml")
     if train_saved == 0:

@@ -17,6 +17,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SLUG = "leducnhuan/crowdhuman"
 RAW_ROOT = PROJECT_ROOT / "data" / "raw" / "crowdhuman"
+DEFAULT_MAX_TRAIN = 1532
+DEFAULT_MAX_VAL = 383  # 1915 total — matches typical successful Kaggle subset download
+MIN_OK_IMAGES = 1500
 KAGGLE_EXE = PROJECT_ROOT / ".venv" / "Scripts" / "kaggle.exe"
 ANNOTATION_FILES = (
     ("CrowdHuman/annotation_train.odgt", "annotation_train.odgt"),
@@ -185,11 +188,13 @@ def download_subset(
 
     print(f"Done. {ok}/{len(jobs)} images in {raw_root}")
     if failed:
-        print(f"WARNING: {len(failed)} image(s) failed. First 5:")
+        print(f"WARNING: {len(failed)} image(s) failed (often Kaggle 429 rate limits). First 5:")
         for item in failed[:5]:
             print(f"  - {item}")
-        if len(failed) > len(jobs) // 10:
+        if ok < MIN_OK_IMAGES:
+            print(f"ERROR: only {ok} images downloaded; need at least {MIN_OK_IMAGES}.")
             return 1
+        print(f"Continuing with {ok} downloaded images — convert will use what is on disk.")
     print("Next: .\\.venv\\Scripts\\python.exe scripts\\convert_crowdhuman.py")
     return 0
 
@@ -205,10 +210,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Download CrowdHuman subset for YOLO training")
     parser.add_argument("--slug", default=DEFAULT_SLUG)
     parser.add_argument("--raw-root", type=Path, default=RAW_ROOT)
-    parser.add_argument("--max-train", type=int, default=2000)
-    parser.add_argument("--max-val", type=int, default=500)
+    parser.add_argument("--max-train", type=int, default=DEFAULT_MAX_TRAIN)
+    parser.add_argument("--max-val", type=int, default=DEFAULT_MAX_VAL)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--workers", type=int, default=2, help="Keep low to avoid Kaggle 429 rate limits")
     parser.add_argument(
         "--full",
         action="store_true",

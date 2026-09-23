@@ -9,7 +9,7 @@ Person detection (YOLO11), multi-object tracking (ByteTrack), optional face ID (
 | Guide | Purpose |
 |-------|---------|
 | [docs/run-demo.md](docs/run-demo.md) | Install and run the webcam demo |
-| [docs/train-yolo.md](docs/train-yolo.md) | Fine-tune YOLO11 (2000+500 images) |
+| [docs/train-yolo.md](docs/train-yolo.md) | Fine-tune YOLO11 (1532+383 images) |
 | [docs/face-recognition.md](docs/face-recognition.md) | Register your face for recognition |
 | [docs/training-reference.md](docs/training-reference.md) | Hyperparameters & architecture (optional) |
 | [docs/thesis/](docs/thesis/) | Persian thesis draft |
@@ -39,7 +39,7 @@ Always use `.\.venv\Scripts\python.exe` — not bare `python` (Store Python brea
 .\scripts\train_yolo11.ps1
 ```
 
-Convert keeps **2000 train + 500 val** images (see [docs/train-yolo.md](docs/train-yolo.md)).
+Convert keeps **1532 train + 383 val** images (1915 total; see [docs/train-yolo.md](docs/train-yolo.md)).
 
 ---
 

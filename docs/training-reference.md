@@ -74,7 +74,7 @@ File: `configs/train_yolo11n.yaml`. Full list: [Ultralytics cfg](https://docs.ul
 | CASIA tampering | No — forgery detection |
 | COCO person | Pretrain source of `yolo11n.pt` |
 
-Default convert: **2000 train + 500 val** images.
+Default convert: **1532 train + 383 val** images (1915 total).
 
 ---
 

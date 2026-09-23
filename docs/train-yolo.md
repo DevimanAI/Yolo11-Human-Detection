@@ -54,7 +54,7 @@ cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 # 2. Download raw CrowdHuman (Kaggle — see below for credentials)
 .\scripts\download_dataset.ps1
 
-# 3. Convert to YOLO format — keeps 2000 train + 500 val only
+# 3. Convert to YOLO format — default 1532 train + 383 val (1915 total)
 .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py
 
 # 4. Train (~50 epochs by default; use -Epochs 5 for a quick test)
@@ -67,14 +67,16 @@ cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 
 ---
 
-## Dataset size (2500 images)
+## Dataset size (1915 images default)
 
 | Split | Default count | Flag |
 |-------|---------------|------|
-| Train | 2000 | `--max-train 2000` (default) |
-| Val | 500 | `--max-val 500` (default) |
+| Train | 1532 | `--max-train 1532` (default) |
+| Val | 383 | `--max-val 383` (default) |
 
-The download script fetches **annotations + 2500 images only** (~1–2 GB), not the full **11 GB** Kaggle archive ([leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman)).
+Kaggle often rate-limits bulk downloads (~1900 images succeed). Defaults match that. If `Images_val/` is nearly empty, convert builds val from train annotations automatically.
+
+The download script fetches **annotations + subset images** (~1–2 GB), not the full **11 GB** archive ([leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman)).
 
 Convert copies those into `data/datasets/person_crowdhuman/` for training.
 

@@ -25,7 +25,7 @@ Open http://127.0.0.1:8765
 .\scripts\train_yolo11.ps1
 ```
 
-Uses **2000 train + 500 val** images from [leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman) (~1–2 GB subset, not 11 GB). Details: [train-yolo.md](train-yolo.md)
+Uses **1532 train + 383 val** (1915 total) from [leducnhuan/crowdhuman](https://www.kaggle.com/datasets/leducnhuan/crowdhuman). Details: [train-yolo.md](train-yolo.md)
 
 ### C. Recognize your face (DeepFace)
 
@@ -62,7 +62,7 @@ Details: [face-recognition.md](face-recognition.md)
 | `setup.ps1` | Create `.venv`, install runtime deps |
 | `setup-train.ps1` | Add training deps (kaggle, tensorboard) |
 | `download_dataset.ps1` | Download CrowdHuman from Kaggle |
-| `convert_crowdhuman.py` | Build YOLO dataset (default 2000/500) |
+| `convert_crowdhuman.py` | Build YOLO dataset (default 1532/383) |
 | `train_yolo11.ps1` | Fine-tune YOLO11n |
 | `register_face.ps1` | Create folder for your face photos |
 | `build_face_gallery.py` | Verify DeepFace gallery |
