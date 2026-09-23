@@ -57,7 +57,7 @@
 | mosaic | 1.0 | robustness جمعیت |
 | amp | true | سرعت GPU |
 
-جزئیات کامل: `docs/training-params-defense-fa.md`.
+جزئیات کامل: `docs/training-reference.md`.
 
 ## 2-5. معیارهای ارزیابی
 

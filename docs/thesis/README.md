@@ -24,8 +24,8 @@
 
 ترکیب فایل‌های 00–07 در Word ≈ **۴۰+ صفحه** با فونت B Nazanin 12.
 
-## اسناد مرتبط
+## اسناد فنی (انگلیسی)
 
-- [training-guide.md](../training-guide.md)
-- [training-params-defense-fa.md](../training-params-defense-fa.md)
-- [deepface-gallery-fa.md](../deepface-gallery-fa.md)
+- [train-yolo.md](../train-yolo.md)
+- [training-reference.md](../training-reference.md)
+- [face-recognition.md](../face-recognition.md)

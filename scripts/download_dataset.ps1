@@ -61,4 +61,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Ok "Download complete."
-Write-Host "Next: .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py"
+Write-Host ""
+Write-Host "Next (keeps 2000 train + 500 val only — not the full 5 GB in YOLO folder):"
+Write-Host "  .\.venv\Scripts\python.exe scripts\convert_crowdhuman.py"
+Write-Host ""
+Write-Host "Optional — delete raw download after convert to free ~5 GB:"
+Write-Host "  Remove-Item -Recurse -Force data\raw\crowdhuman"

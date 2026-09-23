@@ -23,7 +23,7 @@ DeepFace بدون gallery فقط Unknown برمی‌گرداند. با 1–3 ع�
 | Face ID اختیاری | تحقق یافته |
 | رابط وب | تحقق یافته |
 | Dataset + Train | CrowdHuman + اسکریپت train |
-| مستند hyperparameter | training-params-defense-fa.md |
+| مستند hyperparameter | training-reference.md |
 
 ## 4-3. محدودیت‌ها
 

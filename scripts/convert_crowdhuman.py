@@ -181,8 +181,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Convert CrowdHuman to YOLO person dataset")
     parser.add_argument("--raw-root", type=Path, default=RAW_ROOT)
     parser.add_argument("--output-root", type=Path, default=OUTPUT_ROOT)
-    parser.add_argument("--max-train", type=int, default=None, help="Limit train images (CPU smoke runs)")
-    parser.add_argument("--max-val", type=int, default=500, help="Limit val images")
+    parser.add_argument("--max-train", type=int, default=2000, help="Max train images (default 2000)")
+    parser.add_argument("--max-val", type=int, default=500, help="Max val images (default 500)")
     parser.add_argument("--mini", action="store_true", help="Build tiny pseudo-labeled set from bus.jpg")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -210,8 +210,8 @@ def main() -> int:
         val_odgt, args.raw_root, "val", args.output_root, args.max_val, args.seed + 1
     )
 
-    print(f"Train: saved={train_saved} skipped={train_skipped}")
-    print(f"Val:   saved={val_saved} skipped={val_skipped}")
+    print(f"Train: saved={train_saved} skipped={train_skipped} (limit {args.max_train})")
+    print(f"Val:   saved={val_saved} skipped={val_skipped} (limit {args.max_val})")
     print(f"YOLO dataset -> {args.output_root}")
     print(f"Config -> configs/person_crowdhuman.yaml")
     if train_saved == 0:

@@ -1,6 +1,6 @@
 # پیوست تکمیلی — شرح مفصل پارامترهای آموزش (برای دفاع)
 
-این فصل تکمیلی برای پاسخ به سؤالات داور درباره «اگر پارامeter X را تغییر دهید چه می‌شود» به پایان‌نامه افزوده شده است. محتوا هم‌پوشان با `docs/training-params-defense-fa.md` است.
+این فصل تکمیلی برای پاسخ به سؤالات داور درباره «اگر پارامeter X را تغییر دهید چه می‌شود» به پایان‌نامه افزوده شده است. محتوا هم‌پوشان با `docs/training-reference.md` است.
 
 ---
 
@@ -117,5 +117,5 @@ Precision پایین به‌دلیل dataset بسیار کوچک و تکراری
 ## 7-8. مراجع سریع
 
 - configs/train_yolo11n.yaml  
-- docs/training-guide.md  
+- docs/train-yolo.md  
 - Ultralytics cfg: https://docs.ultralytics.com/usage/cfg  
