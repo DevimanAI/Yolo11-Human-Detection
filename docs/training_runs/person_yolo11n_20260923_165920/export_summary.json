@@ -1,0 +1,34 @@
+{
+  "run_dir": "runs\\detect\\person_yolo11n",
+  "exported_at": "20260923_165920",
+  "artifacts": [
+    "results.csv",
+    "results.png",
+    "confusion_matrix.png",
+    "confusion_matrix_normalized.png",
+    "BoxPR_curve.png",
+    "BoxF1_curve.png",
+    "BoxP_curve.png",
+    "BoxR_curve.png",
+    "args.yaml",
+    "weights/best.pt",
+    "weights/last.pt"
+  ],
+  "final_epoch": {
+    "epoch": "50",
+    "time": "1035.37",
+    "train/box_loss": "1.36151",
+    "train/cls_loss": "0.89098",
+    "train/dfl_loss": "1.15552",
+    "metrics/precision(B)": "0.73868",
+    "metrics/recall(B)": "0.50398",
+    "metrics/mAP50(B)": "0.58521",
+    "metrics/mAP50-95(B)": "0.33423",
+    "val/box_loss": "1.44417",
+    "val/cls_loss": "0.95473",
+    "val/dfl_loss": "1.1917",
+    "lr/pg0": "5.96e-05",
+    "lr/pg1": "5.96e-05",
+    "lr/pg2": "5.96e-05"
+  }
+}
