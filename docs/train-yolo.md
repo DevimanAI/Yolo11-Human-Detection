@@ -23,7 +23,7 @@ Training on GPU is **much faster** than CPU (often 10–50× for YOLO fine-tunin
 
 ## Everything stays inside this repo
 
-Scripts set cache paths under the project folder so you can delete the whole repo after your defense:
+Scripts set cache paths under the project folder so you can delete the whole repo later:
 
 | Path | Contents |
 |------|----------|

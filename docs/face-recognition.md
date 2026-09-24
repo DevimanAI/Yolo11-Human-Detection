@@ -14,8 +14,6 @@ Training a face model from zero would need datasets like VGGFace2 — out of sco
 
 ## Quick steps — recognize yourself
 
-Replace `Iman` with your name.
-
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 
