@@ -71,16 +71,6 @@ File: `configs/train_yolo11n.yaml`. Full list: [Ultralytics cfg](https://docs.ul
 | Dataset | Use here? |
 |---------|-----------|
 | CrowdHuman | Yes — person boxes |
-| CASIA tampering | No — forgery detection |
 | COCO person | Pretrain source of `yolo11n.pt` |
 
 Default convert: **1532 train + 383 val** images (1915 total).
-
----
-
-## Common defense questions
-
-1. **Anchors?** YOLO11 is anchor-free; use `imgsz` and loss gains instead.  
-2. **Train ByteTrack?** No — separate tracker config.  
-3. **Train DeepFace CNN?** No — pretrained + your photos in `known_faces/`.  
-4. **Why CrowdHuman not CASIA?** Task mismatch — no person bbox labels in CASIA.
