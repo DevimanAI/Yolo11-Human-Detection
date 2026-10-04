@@ -62,7 +62,7 @@ File: `configs/train_yolo11n.yaml`. Full list: [Ultralytics cfg](https://docs.ul
 | — | `CONFIDENCE` / `conf` |
 | — | `YOLO_MODEL` path |
 | — | `TRACKER` yaml |
-| — | `FACE_MATCH_THRESHOLD` |
+| — | `FACE_MATCH_THRESHOLD` (default `0.22`) |
 
 ---
 

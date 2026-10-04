@@ -62,13 +62,14 @@ In `.env`:
 ```ini
 FACE_RECOGNITION_ENABLED=true
 FACE_MODEL=Facenet512
-FACE_MATCH_THRESHOLD=0.28
+FACE_MATCH_THRESHOLD=0.22
 ```
 
 | Threshold | Effect |
 |-----------|--------|
-| Lower (0.35) | Easier match â€” more false names |
-| Higher (0.45) | Stricter â€” more `Unknown` |
+| Lower (0.15) | Easier match - more false names |
+| Default (0.22) | Balanced for Facenet512 |
+| Higher (0.35) | Stricter - more `Unknown` |
 
 ---
 
