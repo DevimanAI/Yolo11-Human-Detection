@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 from dataclasses import dataclass
@@ -31,7 +31,7 @@ class Settings:
         "yes",
     }
     known_faces_dir: Path = _resolve_path(os.getenv("KNOWN_FACES_DIR", "data/known_faces"))
-    face_match_threshold: float = float(os.getenv("FACE_MATCH_THRESHOLD", "0.4"))
+    face_match_threshold: float = float(os.getenv("FACE_MATCH_THRESHOLD", "0.2"))
     face_model: str = os.getenv("FACE_MODEL", "Facenet512")
     host: str = os.getenv("HOST", "127.0.0.1")
     port: int = int(os.getenv("PORT", "8765"))
@@ -51,3 +51,6 @@ class Settings:
 
 
 settings = Settings()
+
+
+

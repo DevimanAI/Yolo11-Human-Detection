@@ -1,4 +1,4 @@
-# Face recognition — register your face
+﻿# Face recognition â€” register your face
 
 ## Important
 
@@ -8,22 +8,22 @@ This project does **not** train a face CNN from scratch. **DeepFace** ships with
 2. DeepFace builds **embeddings** at startup
 3. Live video crops are matched to your embeddings
 
-Training a face model from zero would need datasets like VGGFace2 — out of scope here.
+Training a face model from zero would need datasets like VGGFace2 â€” out of scope here.
 
 ---
 
-## Quick steps — recognize yourself
+## Quick steps â€” recognize yourself
 
 ```powershell
 cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 
-# 1. Install face dependencies (TensorFlow + DeepFace — large download)
+# 1. Install face dependencies (TensorFlow + DeepFace â€” large download)
 .\.venv\Scripts\python.exe -m pip install -r requirements-face.txt
 
 # 2. Create your folder
 .\scripts\register_face.ps1 -Name "Iman"
 
-# 3. Copy 2–3 clear, front-facing photos into:
+# 3. Copy 2â€“3 clear, front-facing photos into:
 #    data\known_faces\Iman\
 #    e.g. front.jpg, side.jpg
 
@@ -34,7 +34,7 @@ cd C:\Users\Megam\source\repos\Yolo11-Human-Detection
 #    FACE_RECOGNITION_ENABLED=true
 #    KNOWN_FACES_DIR=data/known_faces
 
-# 6. Run demo — stand in front of webcam
+# 6. Run demo â€” stand in front of webcam
 .\.venv\Scripts\python.exe run.py
 ```
 
@@ -49,7 +49,7 @@ When your face is visible in the person box, the label should show **`Iman`** in
 | Do | Avoid |
 |----|--------|
 | Front-facing, good light | Hat/sunglasses covering face |
-| 1–3 photos per person | One tiny thumbnail |
+| 1â€“3 photos per person | One tiny thumbnail |
 | JPG or PNG | Heavy filters |
 | Face fills a good part of the person crop | Standing very far from camera |
 
@@ -62,13 +62,13 @@ In `.env`:
 ```ini
 FACE_RECOGNITION_ENABLED=true
 FACE_MODEL=Facenet512
-FACE_MATCH_THRESHOLD=0.4
+FACE_MATCH_THRESHOLD=0.28
 ```
 
 | Threshold | Effect |
 |-----------|--------|
-| Lower (0.35) | Easier match — more false names |
-| Higher (0.45) | Stricter — more `Unknown` |
+| Lower (0.35) | Easier match â€” more false names |
+| Higher (0.45) | Stricter â€” more `Unknown` |
 
 ---
 
@@ -102,6 +102,7 @@ Restart the server after adding folders.
 1. YOLO detects **person** bbox  
 2. Crop is sent to DeepFace `represent()`  
 3. Cosine distance vs your stored embeddings  
-4. Best match below threshold → your name on the bbox label  
+4. Best match below threshold â†’ your name on the bbox label  
 
 See `app/face_registry.py` and `app/pipeline.py`.
+
